@@ -69,18 +69,32 @@
 			}
 		}
 	};
+	
+    function applyTmpl(templateName, data, target, callback) {
+	    var url = resolveTemplatePath(templateName);
+        if (cache.hasOwnProperty(url)) {
+            callback.call(target, cache[url](data)).trigger('render.handlebars', [templateName, data]);
+        } else {
+            $.get(url, function (template) {
+                cache[url] = Handlebars.compile(template);
+                callback.call(target, cache[url](data)).trigger('render.handlebars', [templateName, data]);
+            }, 'text');
+        }
+	};
 
 	$.fn.render = function (templateName, data) {
-		var url = resolveTemplatePath(templateName);
-		if (cache.hasOwnProperty(url)) {
-			this.html(cache[url](data)).trigger('render.handlebars', [templateName, data]);
-		} else {
-			var $this = this;
-			$.get(url, function (template) {
-				cache[url] = Handlebars.compile(template);
-				$this.html(cache[url](data)).trigger('render.handlebars', [templateName, data]);
-			}, 'text');
-		}
+		applyTmpl(templateName, data, this, this.html);
 		return this;
 	};
+	
+	$.fn.renderAppend = function (templateName, data) {
+        applyTmpl(templateName, data, this, this.append);
+        return this;
+    };
+    
+    $.fn.renderPrepend = function (templateName, data) {
+        applyTmpl(templateName, data, this, this.prepend);
+        return this;
+    };
 }(jQuery));
+
