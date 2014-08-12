@@ -96,5 +96,10 @@
         applyTmpl(templateName, data, this, this.prepend);
         return this;
     };
+    
+    $.fn.renderReplace = function (templateName, data) {
+        applyTmpl(templateName, data, this, this.replaceWith);
+        return this;
+    };
 }(jQuery));
 
